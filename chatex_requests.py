@@ -83,10 +83,3 @@ class Chatex:
         }
         r = self._post_request("wallet/transfers", json.dumps(data), headers)
         print(r, r.text)
-
-
-# chatex = Chatex()
-# token = chatex.get_access_token()
-# print(chatex.create_invoice('BTC', '0.0001'))
-# # print(chatex.get_invoice("YMBQMI"))
-

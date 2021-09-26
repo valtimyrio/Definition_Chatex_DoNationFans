@@ -9,7 +9,7 @@ class Discord:
     def __init__(self, bd):
         self.app_id = "891272172599910430"
         self.public_key = "8191ff43ffc6cf08e003ef4b2e692d0b98ab74ae566af14d3dd5c04b2a28f9c3"
-        self.bot_token = "ODkxNjA5NzU2MDE4NTYxMDQ0.YVA2Sw.rVbhmRPbb5clGSGE7dEyl-ZT3u4"
+        self.bot_token = "ODkxNjA5NzU2MDE4NTYxMDQ0.YVA2Sw.2tT-bWYli1n7ExRVflEgl82cIa0"
         self.bd = bd
         self.chatex = Chatex()
         self.info = """```Привет! 
@@ -21,7 +21,9 @@ class Discord:
 Для оплаты баллов используется Chatex, для начала - 
 узнай, как пополнить кошелек командой "Пополнить баланс"
 
-Чтобы узнать, какие есть статусы - напиши "Покажи статусы"```
+Чтобы узнать, какие есть статусы - напиши "Покажи статусы"
+
+Для покупки статуса введи "Дай статус 'статус'"```
         """
         self.members = {}
         self.guilds = {}
@@ -62,33 +64,34 @@ class Discord:
                     self.guilds[guild.name] = guild
 
                 if self.message_check_startswith(message, "дай статус"):
-                    mess = message.content[4:]
+                    mess = message.content[11:]
                     if mess in self.bd.get_roles_list(name):
                         if self.bd.check_member_has_role(member.id, name, mess):
                             await message.channel.send("У вас уже есть такая роль!")
                         else:
-                            # try:
-                            if self.bd.get_member_balance(member.id, member.name,
-                                                          message.channel.id, name) >= self.bd.get_role_price(
-                                mess, name):
-                                self.bd.change_member_balance(member.id, member.name, message.guild.id, -1 * int(
-                                    self.bd.get_role_price(mess, name)), name)
-                                role = discord.utils.get(message.guild.roles, name=mess)
-                                self.bd.add_role(member.id, member.name, message.guild.id, name, mess)
-                                await member.add_roles(role)
-                                await message.channel.send("Роль успешно добавлена")
-                            else:
-                                await message.channel.send("У вас не хватает средств!")
+                            try:
+                                if self.bd.get_member_balance(member.id, member.name,
+                                                              message.channel.id, name) >= self.bd.get_role_price(
+                                    mess, name):
+                                    self.bd.change_member_balance(member.id, member.name, message.guild.id, -1 * int(
+                                        self.bd.get_role_price(mess, name)), name)
+                                    role = discord.utils.get(message.guild.roles, name=mess)
+                                    self.bd.add_role(member.id, member.name, message.guild.id, name, mess)
+                                    await member.add_roles(role)
+                                    await message.channel.send("Роль успешно добавлена")
+                                else:
+                                    await message.channel.send("У вас не хватает средств!")
 
-                            # except Exception:
-                            #     await message.channel.send("Вас не найдено в системе!")
+                            except Exception:
+                                await message.channel.send("Вас не найдено в системе!")
 
 
                     else:
-                        await message.channel.send("Непонятно")
+                        await message.channel.send("Не понятно!")
+                        await message.channel.send(self.info)
 
                 elif self.message_check_startswith(message, "удали статус"):
-                    mess = message.content[6:]
+                    mess = message.content[13:]
                     print(mess)
                     if mess in self.bd.get_roles_list(name):
                         if self.bd.check_member_has_role(member.id, name, mess):
@@ -102,7 +105,8 @@ class Discord:
                         else:
                             await message.channel.send("У вас еще нет такой роли!")
                     else:
-                        await message.channel.send("Непонятно")
+                        await message.channel.send("Не понятно!")
+                        await message.channel.send(self.info)
 
                 elif self.message_check_startswith(message, "Покажи статусы"):
                     mes1s = ''
@@ -183,10 +187,6 @@ USDT_ERC20:
                     temp_guild = None
                     temp_list = self.bd.check_all_dates()
 
-
-                    # print(self.members)
-                    # print(self.guilds)
-
                     for i in range(0, len(temp_list), 1):
                         self.bd.delete_role(temp_list[i][0],
                                             temp_list[i][1],
@@ -205,30 +205,15 @@ USDT_ERC20:
 
                         role = discord.utils.get(temp_guild.roles, name=temp_list[i][4])
                         await temp_member.remove_roles(role)
-                        # await message.channel.send("Удалено! " + temp_list[i][4])
+                        await message.channel.send("Удалено! " + temp_list[i][4])
 
                 elif self.message_check_startswith(message, "тестовая"):
                     print(message.guild.id, message.guild.name)
                     print(message.guild.roles)
-                    # role = discord.utils.get(message.guild.roles, name="роль-1")
-                    #
-                    # await member.add_roles(role)
-                    #
-                    # self.bd.add_role(member.id, member.name, message.guild.id, name, "роль-2")
-                    #
-                    # await message.channel.send("Роль успешно добавлена")
 
                 elif self.message_check_startswith(message, ""):
                     await message.channel.send(self.info)
 
-            # else:
-            #     print(message.author)
-            #     print(dir(message.author))
-
         client.run(self.bot_token)
         # bot.run(self.bot_token)
 
-
-
-# disc = Discord(bd=bd())
-# disc.start_bot()
